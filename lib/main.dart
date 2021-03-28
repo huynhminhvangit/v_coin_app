@@ -57,6 +57,7 @@ class _LoginFormState extends State<LoginForm> {
             margin: EdgeInsets.symmetric(vertical: 10),
             child: Column(children: <Widget>[
               TextFormField(
+                autofocus: true,
                 controller: _userNameTextController,
                 decoration: InputDecoration(
                   labelText: 'Username',
