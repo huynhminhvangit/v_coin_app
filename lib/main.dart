@@ -175,9 +175,15 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.yellowAccent,
+        title: Text(
+          'vCoin',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
         actions: [
-          IconButton(icon: Icon(Icons.home), onPressed: null),
+          IconButton(icon: Icon(Icons.favorite), onPressed: null),
           IconButton(icon: Icon(Icons.logout), onPressed: null)
         ],
       ),
