@@ -36,16 +36,17 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+
   final _userNameTextController = TextEditingController();
   final _passwordTextController = TextEditingController();
 
-  double _formProgress = 0;
   bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
     return Form(
-      onChanged: _updateFormProgress,
+      key: _formKey,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -57,6 +58,15 @@ class _LoginFormState extends State<LoginForm> {
             margin: EdgeInsets.symmetric(vertical: 10),
             child: Column(children: <Widget>[
               TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter username';
+                  }
+                  if (value.length < 5) {
+                    return 'Username must be 6 characters or more';
+                  }
+                  return null;
+                },
                 autofocus: true,
                 controller: _userNameTextController,
                 decoration: InputDecoration(
@@ -70,7 +80,7 @@ class _LoginFormState extends State<LoginForm> {
                       )),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.red),
+                    borderSide: BorderSide(color: Colors.blue),
                   ),
                 ),
               ),
@@ -80,6 +90,19 @@ class _LoginFormState extends State<LoginForm> {
             margin: EdgeInsets.symmetric(vertical: 10),
             child: Column(children: <Widget>[
               TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter password';
+                  }
+                  Pattern pattern =
+                      r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$';
+
+                  RegExp regExp = new RegExp(pattern);
+                  if (!regExp.hasMatch(value)) {
+                    return 'Password must be 8 characters or more, including numbers, uppercase, lowercase letters, and special characters';
+                  }
+                  return null;
+                },
                 controller: _passwordTextController,
                 decoration: InputDecoration(
                   labelText: 'Password',
@@ -92,7 +115,7 @@ class _LoginFormState extends State<LoginForm> {
                       )),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.red)),
+                      borderSide: BorderSide(color: Colors.blue)),
                   suffixIcon: IconButton(
                     icon: Icon(
                         _obscureText ? Icons.visibility : Icons.visibility_off),
@@ -106,7 +129,7 @@ class _LoginFormState extends State<LoginForm> {
           Container(
               margin: EdgeInsets.symmetric(vertical: 10),
               child: TextButton(
-                onPressed: _formProgress == 1 ? _showWelcomeScreen : null,
+                onPressed: _showWelcomeScreen,
                 child: Ink(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
@@ -114,15 +137,9 @@ class _LoginFormState extends State<LoginForm> {
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
                       colors: [
-                        _formProgress == 1
-                            ? Color(0xffff5f6d)
-                            : Colors.grey.shade400,
-                        _formProgress == 1
-                            ? Color(0xffff5f6d)
-                            : Colors.grey.shade400,
-                        _formProgress == 1
-                            ? Color(0xffffc371)
-                            : Colors.grey.shade400,
+                        Color(0xffff5f6d),
+                        Color(0xffff5f6d),
+                        Color(0xffffc371),
                       ],
                     ),
                   ),
@@ -145,22 +162,11 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   void _showWelcomeScreen() {
-    Navigator.of(context).pushNamed('/welcome');
-  }
-
-  void _updateFormProgress() {
-    var progress = 0.0;
-    var controlers = [_userNameTextController, _passwordTextController];
-
-    for (var controller in controlers) {
-      if (controller.value.text.isNotEmpty) {
-        progress += 1 / controlers.length;
-      }
+    if (_formKey.currentState.validate()) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Processing Data')));
     }
-
-    setState(() {
-      _formProgress = progress;
-    });
+    // Navigator.of(context).pushNamed('/welcome');
   }
 
   void _toggle() {
